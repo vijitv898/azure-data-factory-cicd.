@@ -35,8 +35,9 @@ jobs:
           git pull origin ${{ github.event.inputs.from_branch }}
           git checkout ${{ github.event.inputs.to_branch }}
           git pull origin ${{ github.event.inputs.to_branch }}
-          git merge --no-ff ${{ github.event.inputs.from_branch }} -m "Promote changes from ${{ github.event.inputs.from_branch }} to ${{ github.event.inputs.to_branch }}"
+          git merge --allow-unrelated-histories --no-ff ${{ github.event.inputs.from_branch }} -m "Promote changes from ${{ github.event.inputs.from_branch }} to ${{ github.event.inputs.to_branch }}"
           git push origin ${{ github.event.inputs.to_branch }}
+
 
       # Step 4: Log success
       - name: Log success
