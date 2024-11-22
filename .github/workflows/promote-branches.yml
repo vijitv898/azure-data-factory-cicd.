@@ -1,0 +1,43 @@
+name: Promote Changes Between Branches
+
+on:
+  workflow_dispatch:  # Allows manual triggering from GitHub Actions UI
+    inputs:
+      from_branch:
+        description: 'Source branch (e.g., develop)'
+        required: true
+        default: 'develop'
+      to_branch:
+        description: 'Target branch (e.g., qa or main)'
+        required: true
+        default: 'qa'
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Git user for committing
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      # Step 3: Merge changes from source to target branch
+      - name: Merge changes
+        run: |
+          git fetch origin
+          git checkout ${{ github.event.inputs.from_branch }}
+          git pull origin ${{ github.event.inputs.from_branch }}
+          git checkout ${{ github.event.inputs.to_branch }}
+          git pull origin ${{ github.event.inputs.to_branch }}
+          git merge --no-ff ${{ github.event.inputs.from_branch }} -m "Promote changes from ${{ github.event.inputs.from_branch }} to ${{ github.event.inputs.to_branch }}"
+          git push origin ${{ github.event.inputs.to_branch }}
+
+      # Step 4: Log success
+      - name: Log success
+        run: echo "Changes successfully promoted from ${{ github.event.inputs.from_branch }} to ${{ github.event.inputs.to_branch }}"
